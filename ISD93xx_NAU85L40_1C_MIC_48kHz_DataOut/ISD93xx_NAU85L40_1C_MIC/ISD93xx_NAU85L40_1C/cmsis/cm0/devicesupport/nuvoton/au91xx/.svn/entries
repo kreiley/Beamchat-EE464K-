@@ -1,0 +1,79 @@
+8
+
+dir
+26971
+http://ntcainfo22/svn/UL00/Products/ChipCorder/ISD22XX/ISD2230_SW_DEV/CMSIS/CM0/DeviceSupport/Nuvoton/AU91XX
+http://ntcainfo22/svn/UL00
+
+
+
+2013-11-26T18:06:43.518356Z
+26496
+NUVOTON\x5cGJackson
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+846f242d-1871-2d4b-9d5c-981c5b478faf
+
+startup
+dir
+
+boot_AU91xx.c
+file
+
+
+
+
+2013-12-20T06:39:16.218315Z
+86117b1b32ce09bf3b6586f1b09dfbd3
+2013-11-09T00:42:44.493642Z
+26407
+NUVOTON\x5cGJackson
+
+system_AU91xx.c
+file
+
+
+
+
+2013-12-20T06:39:16.228315Z
+eb67d1c6cd5bb508678dc5e5559ddebf
+2013-03-04T22:24:45.782541Z
+24003
+NUVOTON\x5cGJackson
+
+AU91xx.h
+file
+
+
+
+
+2013-12-20T06:39:16.248315Z
+6a6cde16c950bc3a53186178d53102d5
+2013-11-26T18:06:43.518356Z
+26496
+NUVOTON\x5cGJackson
+
+system_AU91xx.h
+file
+
+
+
+
+2013-12-20T06:39:16.258316Z
+b182ae36fbe238a05b922578c71f6e33
+2013-03-04T21:00:25.277995Z
+23992
+NUVOTON\x5cGJackson
+

@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/UL00/!svn/ver/26649/Products/ChipCorder/ISD9340/software/ISD9340_Keil/Sample/Driver/Smpl_DrvI2S_NAU8822
+END
+ISD9340 I2S FIFO write sequence.xlsx
+K 25
+svn:wc:ra_dav:version-url
+V 153
+/svn/UL00/!svn/ver/26344/Products/ChipCorder/ISD9340/software/ISD9340_Keil/Sample/Driver/Smpl_DrvI2S_NAU8822/ISD9340%20I2S%20FIFO%20write%20sequence.xlsx
+END
+WAU8822Setup.c
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/svn/UL00/!svn/ver/26649/Products/ChipCorder/ISD9340/software/ISD9340_Keil/Sample/Driver/Smpl_DrvI2S_NAU8822/WAU8822Setup.c
+END
+Smpl_DrvI2S.c
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/svn/UL00/!svn/ver/26649/Products/ChipCorder/ISD9340/software/ISD9340_Keil/Sample/Driver/Smpl_DrvI2S_NAU8822/Smpl_DrvI2S.c
+END
+Smpl_DrvI2S.uvproj
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svn/UL00/!svn/ver/26344/Products/ChipCorder/ISD9340/software/ISD9340_Keil/Sample/Driver/Smpl_DrvI2S_NAU8822/Smpl_DrvI2S.uvproj
+END

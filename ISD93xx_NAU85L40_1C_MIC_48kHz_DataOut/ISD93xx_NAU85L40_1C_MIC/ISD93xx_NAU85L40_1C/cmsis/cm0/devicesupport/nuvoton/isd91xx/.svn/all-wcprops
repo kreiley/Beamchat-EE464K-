@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/UL00/!svn/ver/23049/Products/ChipCorder/ISD22XX/ISD2230_SW_DEV/CMSIS/CM0/DeviceSupport/Nuvoton/ISD91xx
+END
+system_ISD9xx.h
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/svn/UL00/!svn/ver/22140/Products/ChipCorder/ISD22XX/ISD2230_SW_DEV/CMSIS/CM0/DeviceSupport/Nuvoton/ISD91xx/system_ISD9xx.h
+END
+boot_ISD9xx.c
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/svn/UL00/!svn/ver/22477/Products/ChipCorder/ISD22XX/ISD2230_SW_DEV/CMSIS/CM0/DeviceSupport/Nuvoton/ISD91xx/boot_ISD9xx.c
+END
+system_ISD9xx.c
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/svn/UL00/!svn/ver/22140/Products/ChipCorder/ISD22XX/ISD2230_SW_DEV/CMSIS/CM0/DeviceSupport/Nuvoton/ISD91xx/system_ISD9xx.c
+END
+ISD9xx.h
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svn/UL00/!svn/ver/22453/Products/ChipCorder/ISD22XX/ISD2230_SW_DEV/CMSIS/CM0/DeviceSupport/Nuvoton/ISD91xx/ISD9xx.h
+END

@@ -1,0 +1,13 @@
+.\obj\dpwm_setup.o: DPWM_Setup.c
+.\obj\dpwm_setup.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\obj\dpwm_setup.o: ..\..\..\Include\Driver\DrvDPWM.h
+.\obj\dpwm_setup.o: ..\..\..\..\CMSIS\CM0\DeviceSupport\Nuvoton\ISD93xx\isd93xx.h
+.\obj\dpwm_setup.o: ..\..\..\..\CMSIS\CM0\CoreSupport\core_cm0.h
+.\obj\dpwm_setup.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\obj\dpwm_setup.o: ..\..\..\..\CMSIS\CM0\CoreSupport\core_cmInstr.h
+.\obj\dpwm_setup.o: ..\..\..\..\CMSIS\CM0\CoreSupport\core_cmFunc.h
+.\obj\dpwm_setup.o: ..\..\..\..\CMSIS\CM0\DeviceSupport\Nuvoton\ISD93xx\system_ISD93xx.h
+.\obj\dpwm_setup.o: ..\..\..\Include\System\SysInfra.h
+.\obj\dpwm_setup.o: ..\..\..\Include\System\ModuleID.h
+.\obj\dpwm_setup.o: ..\..\..\..\CMSIS\CM0\CoreSupport\core_cm0.h
+.\obj\dpwm_setup.o: ..\..\..\Include\Driver\DrvPDMA.h

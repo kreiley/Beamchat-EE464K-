@@ -1,0 +1,202 @@
+/*---------------------------------------------------------------------------------------------------------*/
+/*                                                                                                         */
+/* Copyright(c) 2013 Nuvoton Technology Corp. All rights reserved.                                         */
+/*                                                                                                         */
+/*---------------------------------------------------------------------------------------------------------*/
+#include <stdio.h>
+#include "DrvI2C.h"
+
+
+//=============================================================
+// I2C transaction to set up WAU8822
+//=============================================================
+
+static uint16_t reg_dat;
+
+void Delay(int count)
+{
+	volatile uint32_t i;
+	for (i = 0; i < count ; i++);
+}
+void NAU85L40_ReadData (uint16_t addr, uint16_t * data)
+{
+	
+	DrvI2C_Ctrl(I2C_PORT0, 1, 0, 0, 0);
+	while (!I2C0->CON.SI); //wait for interrupt
+	
+	I2C0->DATA  = (0x1C<<1) | 0x1 ; //send device address
+	DrvI2C_Ctrl(I2C_PORT0, 0, 0, 1, 0);
+	while (!I2C0->CON.SI); //wait for interrupt
+	
+	I2C0->DATA  = addr>>8; //pad 0 to MSByte of address
+	DrvI2C_Ctrl(I2C_PORT0, 0, 0, 1, 0);
+	while (!I2C0->CON.SI); //wait for interrupt
+	
+	I2C0->DATA  = addr; //transfer LSByte of address		
+	DrvI2C_Ctrl(I2C_PORT0, 0, 0, 1, 1);
+	while (!I2C0->CON.SI); //wait for interrupt	
+	
+	*data = (I2C0->DATA ) <<8;
+	DrvI2C_Ctrl(I2C_PORT0, 0, 0, 1, 1);
+	while (!I2C0->CON.SI); //wait for interrupt
+	
+	*data = (*data) | ((I2C0->DATA) & 0xFF);
+	DrvI2C_Ctrl(I2C_PORT0, 0, 0, 1, 1);
+	while (!I2C0->CON.SI); //wait for interrupt
+	
+	DrvI2C_Ctrl(I2C_PORT0, 0, 1, 1, 0);
+}
+
+
+
+
+
+void NAU85L40_WriteData (uint8_t deviceID,uint16_t addr, uint16_t data)
+{
+	
+	DrvI2C_Ctrl(I2C_PORT0, 1, 0, 0, 0);
+	while (!I2C0->CON.SI); //wait for interrupt
+	
+	I2C0->DATA  = deviceID<<1; //send device address
+	DrvI2C_Ctrl(I2C_PORT0, 0, 0, 1, 0);
+	while (!I2C0->CON.SI); //wait for interrupt
+	
+	I2C0->DATA  = addr>>8; //pad 0 to MSByte of address
+	DrvI2C_Ctrl(I2C_PORT0, 0, 0, 1, 0);
+	while (!I2C0->CON.SI); //wait for interrupt
+	
+	I2C0->DATA  = addr; //transfer LSByte of address		
+	DrvI2C_Ctrl(I2C_PORT0, 0, 0, 1, 0);
+	while (!I2C0->CON.SI); //wait for interrupt	
+	
+	I2C0->DATA  = data >> 8; //transfer MSByte of data
+	DrvI2C_Ctrl(I2C_PORT0, 0, 0, 1, 0);
+	while (!I2C0->CON.SI); //wait for interrupt
+	
+	I2C0->DATA  = data & 0xFF; //transfer LSByte of data
+	DrvI2C_Ctrl(I2C_PORT0, 0, 0, 1, 0);
+	while (!I2C0->CON.SI); //wait for interrupt
+	
+	DrvI2C_Ctrl(I2C_PORT0, 0, 1, 1, 0);
+	
+	
+}
+
+
+void  NAU85L40_EnterADCandDACMode(uint8_t deviceID)
+{
+
+		I2C0->CON.EI = 0;
+		NAU85L40_WriteData(deviceID,0x00,  0x000);   /* Reset all registers */
+		Delay(0x200);
+		NAU85L40_WriteData(deviceID,0x01, 0x000F);//R1 enable all four ADC channels
+	
+		NAU85L40_WriteData(deviceID,0x02, 0x8003);
+	
+		
+		NAU85L40_WriteData(deviceID,0x03, 0x8004); //SYSCLK = MCLKI pin; ADC_CLK = MCLKI/2; 
+		
+		NAU85L40_WriteData(deviceID,0x04, 0x1C04); //FLL max drive strength
+		NAU85L40_WriteData(deviceID,0x05, 0x3126);
+		NAU85L40_WriteData(deviceID,0x06, 0x0008);
+		NAU85L40_WriteData(deviceID,0x07, 0x0010);
+		NAU85L40_WriteData(deviceID,0x08, 0xc000);
+		NAU85L40_WriteData(deviceID,0x09, 0xe000);
+		NAU85L40_WriteData(deviceID,0x0A, 0xf13c);
+		
+		//NAU85L40_WriteData(deviceID,0x10, 0x000e); //wordlength 32 bit - standard I2S format
+		NAU85L40_WriteData(deviceID,0x10, 0x0043); //wordlength 16 bit - PCMB
+		if (deviceID == 0x1C)
+		{
+			NAU85L40_WriteData(deviceID,0x12, 0x3000); //turn on DO34 in high impedence during offset time
+			NAU85L40_WriteData(deviceID,0x14, 0x800f); //turn on TDM mode only
+		}
+		else if (deviceID == 0x1D)
+		{
+			NAU85L40_WriteData(deviceID,0x12, 0x2040); //turn on DO34 in high impedence during offset time and offset time shift = 4 channels * datalength + 1 
+			NAU85L40_WriteData(deviceID,0x14, 0xC00f); //turn on TDM mode and TDM offset 
+		}
+		else
+		{
+			NAU85L40_WriteData(deviceID,0x12, 0x8000);
+			NAU85L40_WriteData(deviceID,0x14, 0x800f);
+		}
+		
+		NAU85L40_WriteData(deviceID,0x3A, 0x0062); //OSR = 128; sampling rate = (4.096MHz/2)/(128) = 16kHz	
+	
+		NAU85L40_WriteData(deviceID,0x11, 0x0002);		 //PCMB
+		
+		NAU85L40_WriteData(deviceID,0x13, 0x0000);
+		/*----------ALC-------------*/
+		NAU85L40_WriteData(deviceID,0x20, 0x4070);		
+		NAU85L40_WriteData(deviceID,0x21, 0x700B);
+		NAU85L40_WriteData(deviceID,0x22, 0xf022);
+		
+//		NAU85L40_WriteData(deviceID,0x23, 0x1010); //default setting
+//		NAU85L40_WriteData(deviceID,0x24, 0x1010); //default setting
+				
+//		NAU85L40_WriteData(deviceID,0x23, 0x9090); //enable ALC gain update with initial gain = 0dB
+//		NAU85L40_WriteData(deviceID,0x24, 0x9090); //enable ALC gain update with initial gain = 0dB
+		
+		NAU85L40_WriteData(deviceID,0x23, 0x8080); //enable ALC gain update with initial gain = -12dB
+		NAU85L40_WriteData(deviceID,0x24, 0x8080); //enable ALC gain update with initial gain = -12dB		
+		
+		NAU85L40_WriteData(deviceID,0x2D, 0x1010);
+		NAU85L40_WriteData(deviceID,0x2E, 0x1010);
+		NAU85L40_WriteData(deviceID,0x2F, 0x0000);
+		NAU85L40_WriteData(deviceID,0x30, 0x0000);
+		NAU85L40_WriteData(deviceID,0x31, 0x0000);
+		NAU85L40_WriteData(deviceID,0x32, 0x0000);
+		NAU85L40_WriteData(deviceID,0x33, 0x0000);
+		NAU85L40_WriteData(deviceID,0x34, 0x0000);
+		NAU85L40_WriteData(deviceID,0x35, 0x0000);
+		NAU85L40_WriteData(deviceID,0x36, 0x0000);
+		NAU85L40_WriteData(deviceID,0x37, 0x0000);
+		
+		/*----------HP filter-------------*/
+		NAU85L40_WriteData(deviceID,0x38, 0x1010);
+		NAU85L40_WriteData(deviceID,0x39, 0x1010);
+		/*----------Digital Gain-----------*/
+		NAU85L40_WriteData(deviceID,0x40, 0x040a);
+		NAU85L40_WriteData(deviceID,0x41, 0x040a);
+		NAU85L40_WriteData(deviceID,0x42, 0x040a);
+		NAU85L40_WriteData(deviceID,0x43, 0x040a);
+
+//		NAU85L40_WriteData(deviceID,0x40, 0x0450); //+10dB
+//		NAU85L40_WriteData(deviceID,0x41, 0x0450); //+10dB
+//		NAU85L40_WriteData(deviceID,0x42, 0x0450); //+10dB
+//		NAU85L40_WriteData(deviceID,0x43, 0x0450); //+10dB
+		/*--------------------------------*/
+		NAU85L40_WriteData(deviceID,0x44, 0x00E4);
+		NAU85L40_WriteData(deviceID,0x48, 0x0000);
+		NAU85L40_WriteData(deviceID,0x49, 0x0000);
+		NAU85L40_WriteData(deviceID,0x4A, 0x0000);
+		NAU85L40_WriteData(deviceID,0x4B, 0x0000);
+		NAU85L40_WriteData(deviceID,0x4C, 0x0000);
+		NAU85L40_WriteData(deviceID,0x4D, 0x0000);
+		NAU85L40_WriteData(deviceID,0x4E, 0x0000);
+		NAU85L40_WriteData(deviceID,0x4F, 0x0000);
+		NAU85L40_WriteData(deviceID,0x50, 0x0000);
+		NAU85L40_WriteData(deviceID,0x51, 0x0000);
+		NAU85L40_WriteData(deviceID,0x52, 0xEFFF);
+		NAU85L40_WriteData(deviceID,0x57, 0x0000);
+		NAU85L40_WriteData(deviceID,0x58, 0x1CF0);
+		NAU85L40_WriteData(deviceID,0x59, 0x0008);
+		NAU85L40_WriteData(deviceID,0x60, 0x0060);
+		NAU85L40_WriteData(deviceID,0x61, 0x0000);
+		NAU85L40_WriteData(deviceID,0x62, 0x0000);
+		NAU85L40_WriteData(deviceID,0x63, 0x0000);
+		NAU85L40_WriteData(deviceID,0x64, 0x0011);
+		NAU85L40_WriteData(deviceID,0x65, 0x0220);
+		NAU85L40_WriteData(deviceID,0x66, 0x000F); //modify LSN to turn on/off signal for ADC channels 1-4
+		NAU85L40_WriteData(deviceID,0x67, 0x0D04);
+		NAU85L40_WriteData(deviceID,0x68, 0x7000);
+		NAU85L40_WriteData(deviceID,0x69, 0x0000);
+		NAU85L40_WriteData(deviceID,0x6A, 0x0000);
+		NAU85L40_WriteData(deviceID,0x6B, 0x2525);
+		NAU85L40_WriteData(deviceID,0x6C, 0x2525);
+		NAU85L40_WriteData(deviceID,0x6D, 0xF000); //modify MSN to turn on/off PGA channels 1-4
+
+}
+
+

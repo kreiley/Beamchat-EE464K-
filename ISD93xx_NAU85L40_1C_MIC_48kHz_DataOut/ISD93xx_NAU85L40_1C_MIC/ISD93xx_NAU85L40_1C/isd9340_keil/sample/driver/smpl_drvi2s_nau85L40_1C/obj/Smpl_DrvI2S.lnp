@@ -1,0 +1,19 @@
+--cpu Cortex-M0
+".\obj\core_cm0.o"
+".\obj\boot_isd93xx.o"
+".\obj\system_isd93xx.o"
+".\obj\smpl_drvi2s.o"
+".\obj\nau85l40setup.o"
+".\obj\retarget.o"
+".\obj\drvi2c.o"
+".\obj\drvi2s.o"
+".\obj\drvgpio.o"
+".\obj\drvsys.o"
+".\obj\drvuart.o"
+"..\..\..\Lib\SemiHost_Keil.lib"
+".\obj\drvdpwm.o"
+".\obj\drvpdma.o"
+--ro-base 0x00000000 --entry 0x00000000 --rw-base 0x20000000 --entry Reset_Handler --first __Vectors --strict
+--map --first='boot_ISD93xx.o(vectors)' --datacompressor=off --info=inline --entry Reset_Handler --callgraph --summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\lst\Smpl_DrvI2S.map" -o .\obj\Smpl_DrvI2S.axf

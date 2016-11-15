@@ -1,0 +1,12 @@
+.\obj\nau85l40setup.o: NAU85L40Setup.c
+.\obj\nau85l40setup.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\obj\nau85l40setup.o: ..\..\..\Include\Driver\DrvI2C.h
+.\obj\nau85l40setup.o: ..\..\..\..\CMSIS\CM0\DeviceSupport\Nuvoton\ISD93xx\isd93xx.h
+.\obj\nau85l40setup.o: ..\..\..\..\CMSIS\CM0\CoreSupport\core_cm0.h
+.\obj\nau85l40setup.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\obj\nau85l40setup.o: ..\..\..\..\CMSIS\CM0\CoreSupport\core_cmInstr.h
+.\obj\nau85l40setup.o: ..\..\..\..\CMSIS\CM0\CoreSupport\core_cmFunc.h
+.\obj\nau85l40setup.o: ..\..\..\..\CMSIS\CM0\DeviceSupport\Nuvoton\ISD93xx\system_ISD93xx.h
+.\obj\nau85l40setup.o: ..\..\..\Include\System\SysInfra.h
+.\obj\nau85l40setup.o: ..\..\..\Include\System\ModuleID.h
+.\obj\nau85l40setup.o: ..\..\..\..\CMSIS\CM0\CoreSupport\core_cm0.h

@@ -1,0 +1,194 @@
+/*---------------------------------------------------------------------------------------------------------*/
+/*                                                                                                         */
+/* Copyright(c) 2013 Nuvoton Technology Corp. All rights reserved.                                         */
+/*                                                                                                         */
+/*---------------------------------------------------------------------------------------------------------*/
+#include <stdio.h>
+#include "DrvUART.h"
+#include "DrvSYS.h"
+#include "DrvGPIO.h"
+#include "DrvI2S.h"
+#include "DrvI2C.h"
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* Macro, type and constant definitions                                                                    */
+/*---------------------------------------------------------------------------------------------------------*/
+#define BUFF_LEN    64
+
+uint32_t PcmBuff[BUFF_LEN] = {0};
+uint32_t u32BuffPos = 0;
+uint32_t u32startFlag;
+
+void  WAU88XX_EnterADCandDACMode(void);
+/*---------------------------------------------------------------------------------------------------------*/
+/* Define functions prototype                                                                              */
+/*---------------------------------------------------------------------------------------------------------*/
+
+
+/*---------------------------------------------------------------------------------------------------------*/
+/*  I2S Tx Threshold Level Callback Function when Tx FIFO is less than Tx FIFO Threshold Level             */
+/*---------------------------------------------------------------------------------------------------------*/
+void Tx_thresholdCallbackfn(uint32_t status)
+{
+	uint32_t u32Len, i;
+	uint32_t * pBuff;
+
+	pBuff = &PcmBuff[0];
+
+	/* Read Tx FIFO free size */
+	u32Len = 8 - _DRVI2S_READ_TX_FIFO_LEVEL();
+
+	if (u32BuffPos >= 8)
+	{
+		for	(i = 0; i < u32Len; i++)
+		{
+	   		_DRVI2S_WRITE_TX_FIFO(pBuff[i]);
+		}
+
+		for (i = 0; i < BUFF_LEN - u32Len; i++)
+		{
+			pBuff[i] = pBuff[i + u32Len];
+		}
+
+		u32BuffPos -= u32Len;
+	}
+	else
+	{
+		for	(i = 0; i < u32Len; i++)
+		{
+	   		_DRVI2S_WRITE_TX_FIFO(0x00);
+		}
+	}
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/*  I2S Rx Threshold Level Callback Function when Rx FIFO is more than Rx FIFO Threshold Level             */
+/*---------------------------------------------------------------------------------------------------------*/
+void Rx_thresholdCallbackfn(uint32_t status)
+{
+	uint32_t u32Len, i;
+	uint32_t *pBuff;
+
+	if (u32BuffPos < (BUFF_LEN-8))
+	{
+		pBuff = &PcmBuff[u32BuffPos];
+
+		/* Read Rx FIFO Level */
+		u32Len = _DRVI2S_READ_RX_FIFO_LEVEL();
+
+		for ( i = 0; i < u32Len; i++ )
+		{
+			pBuff[i] = _DRVI2S_READ_RX_FIFO();
+		}
+
+		u32BuffPos += u32Len;
+
+		if (u32BuffPos >= BUFF_LEN)
+		{
+			u32BuffPos =	0;
+		}
+	}
+}
+
+void LdoOn(void)
+{
+	SYSCLK->APBCLK.ANA_EN=1;
+	ANA->LDOPD.PD=0;
+	ANA->LDOSET=3;
+}
+
+/*---------------------------------------------------------------------------------------------------------*/
+/*  MAIN function																										  */
+/*---------------------------------------------------------------------------------------------------------*/
+int main (void)
+{
+    S_DRVI2S_DATA_T st;
+	STR_UART_T param;
+
+	/* Step 1. Enable and select clock source*/
+	/* Unlock the protected registers */	
+	UNLOCKREG();
+	DrvSYS_SetOscCtrl(E_SYS_OSC49M, 1);
+	DrvSYS_SetHCLK(E_DRVSYS_48M, 1);
+	DrvSYS_SetIPClockSource(E_SYS_I2S_CLKSRC, 2);
+	LOCKREG();
+
+	LdoOn();
+
+	/* Step 2. GPIO initial and select operation mode for UART*/
+	/* Init UART for printf */
+	DrvGPIO_UART_TXRX_PA8_PA9();
+	
+    param.u32BaudRate 	     = 115200;
+    param.u8cDataBits        = DRVUART_DATABITS_8;
+    param.u8cStopBits        = DRVUART_STOPBITS_1;
+    param.u8cParity          = DRVUART_PARITY_NONE;
+    param.u8cRxTriggerLevel  = DRVUART_FIFO_1BYTES;
+    param.u8TimeOut        	 = 0;
+    DrvUART_Open(UART_PORT0, &param);
+
+	/* Step 3. GPIO initial and select operation mode for I2C*/
+	DrvGPIO_I2C_PA10_PA11();
+	DrvI2C_Open(I2C_PORT0, (DrvSYS_GetHCLK() * 1000), 48000);  //clock = 48Kbps
+	DrvI2C_EnableInt(I2C_PORT0); //Enable I2C0 interrupt and set corresponding NVIC bit
+
+	/* Step 4. GPIO initial and select operation mode for I2S*/  
+	DrvGPIO_I2S_PA4_PA5_PA6_PA7();
+	DrvGPIO_I2S_MCLK_PB1();
+
+    st.u32SampleRate 	 = 16000;
+    st.u8WordWidth 	 	 = DRVI2S_DATABIT_16;
+    st.u8AudioFormat 	 = DRVI2S_STEREO;
+	st.u8DataFormat  	 = DRVI2S_FORMAT_I2S;
+    st.u8Mode 		 	 = DRVI2S_MODE_MASTER;
+    st.u8RxFIFOThreshold = DRVI2S_FIFO_LEVEL_WORD_4;
+    st.u8TxFIFOThreshold = DRVI2S_FIFO_LEVEL_WORD_8-1;
+	DrvI2S_Open(&st);
+
+	/* Step 5. Set and enable MCLK*/
+	DrvI2S_SetMCLK(4096000);  //MCLK = 4096MHz
+	DrvI2S_EnableMCLK(1);	   //enable MCLK	  
+
+	/* Step 6. Configure CODEC registers*/
+	WAU88XX_EnterADCandDACMode();
+
+
+	printf("\n\n");
+    printf("+----------------------------------------------------------------------+\n");
+    printf("|                       I2S Driver Sample Code                         |\n");
+    printf("+----------------------------------------------------------------------+\n");
+    printf("\n");
+	printf("Pin configuration: PA4=FS, PA5=BCLK, PA6=SDI, PA7=SDO, PB1=MCLK, PA10=SDA, PA11=SCL\n");
+	printf("ISD93xx as I2S Master, NAU8822 as I2S Slave                   \n");
+	printf("BCLK = %d Hz, MCLK = %d Hz \n", DrvI2S_GetBCLK(), DrvI2S_GetMCLK());
+	printf("When recived ADCOUT data from NAU8822, will send back to NAU8822's DACIN\n");
+	printf("NAU8822 LMIC/RMIC input and LHP/RHP output\n");
+	printf("\n");
+
+	/* Step 7. Enable Rx and interrupt*/
+	//Enable Rx threshold level interrupt and install its callback function
+	DrvI2S_EnableInt(I2S_RX_FIFO_THRESHOLD, Rx_thresholdCallbackfn);
+	u32startFlag = 1;
+
+	// Enable I2S Rx function to receive data
+	DrvI2S_EnableRx(TRUE);
+
+	while(1)
+	{
+		if (u32startFlag)
+		{
+			/* Step 8. Enable Tx and interrupt*/
+			// Enable I2S Tx function to send data when data in the buffer is more than half of buffer size
+			if (u32BuffPos >= BUFF_LEN/2)
+			{
+				DrvI2S_EnableInt(I2S_TX_FIFO_THRESHOLD, Tx_thresholdCallbackfn);
+				DrvI2S_EnableTx(TRUE);
+				u32startFlag = 0;
+			}
+		}
+	}
+
+
+
+}
+

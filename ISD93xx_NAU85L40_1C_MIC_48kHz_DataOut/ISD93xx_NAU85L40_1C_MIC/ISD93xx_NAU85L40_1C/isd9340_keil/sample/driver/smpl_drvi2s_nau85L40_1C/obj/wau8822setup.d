@@ -1,0 +1,12 @@
+.\obj\wau8822setup.o: WAU8822Setup.c
+.\obj\wau8822setup.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\obj\wau8822setup.o: ..\..\..\Include\Driver\DrvI2C.h
+.\obj\wau8822setup.o: ..\..\..\..\CMSIS\CM0\DeviceSupport\Nuvoton\ISD93xx\isd93xx.h
+.\obj\wau8822setup.o: ..\..\..\..\CMSIS\CM0\CoreSupport\core_cm0.h
+.\obj\wau8822setup.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\obj\wau8822setup.o: ..\..\..\..\CMSIS\CM0\CoreSupport\core_cmInstr.h
+.\obj\wau8822setup.o: ..\..\..\..\CMSIS\CM0\CoreSupport\core_cmFunc.h
+.\obj\wau8822setup.o: ..\..\..\..\CMSIS\CM0\DeviceSupport\Nuvoton\ISD93xx\system_ISD93xx.h
+.\obj\wau8822setup.o: ..\..\..\Include\System\SysInfra.h
+.\obj\wau8822setup.o: ..\..\..\Include\System\ModuleID.h
+.\obj\wau8822setup.o: ..\..\..\..\CMSIS\CM0\CoreSupport\core_cm0.h

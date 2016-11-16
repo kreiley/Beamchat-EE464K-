@@ -1,11 +1,10 @@
 #include <stdio.h>
-#include <math.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <math.h>
 #include "delay_sound.h"
-#include "FixedBeamformer.c"
 #include "FixedBeamformer.h"
 #include "localization.h"
-#include <stdbool.h>
 #include "Beamforming.h"
 
 #define ANGLE_RESOLUTION 500    // Number of angle points to calculate
@@ -16,15 +15,28 @@
 #define buffer_size 100
 #define BUFFER_SIZE 64000
 
-void Beamforming_Initialization(void){}
-	float angle = 0;
+delay * delays[8];
+float freq = 16000; //frequency of data input
+float speed_of_sound = 340.3; //speed of sound at sea level
+int filterLength = 11; //Numer of FIR filter taps for fractional delay(shouled be odd)
+float angle = 0;
+float volume = .75;
+bool turn_off = false;
+char mode = 'M';
+microphone * m1;
+microphone * m2;
+microphone * m3;
+
+
+void Beamforming_Initialization(void){
+	angle = 0;
 	mic_array_init();
 	delays_init();
 	localization_init();
 }
 
 
-int main1(int argc, char* argv[]){
+int main(int argc, char* argv[]){
 	if(argc == 2){angle = atof(argv[1]);}
 	if(argc == 3){angle = atof(argv[1]); volume = atof(argv[2]);}
 	if(argc == 4){angle = atof(argv[1]); volume = atof(argv[2]); mode = argv[3][0];}
@@ -51,13 +63,13 @@ int main1(int argc, char* argv[]){
 	//run(in);
 }
 
-uint32_t run(uint32_t * in0, uint32_t * in1, uint32_t * in2, uint32_t * in3, int32_t position){
-	uint32_t sum = 0;
-	uint32_t output = 0;
-	sum = delay_out(delays[0], in0[position]);	
-	sum+= delay_out(delays[1], in1[position]);	
-	sum+= delay_out(delays[2], in2[position]);	
-	sum+= delay_out(delays[3], in3[position]);
+uint32_t run(float in0, float in1, float in2, float in3){
+	float output = 0;
+	float sum;
+	sum = delay_out(0, in0);	
+	sum+= delay_out(1, in1);	
+	sum+= delay_out(2, in2);	
+	sum+= delay_out(3, in3);
 	return sum/4;
 }
 /*
@@ -81,7 +93,7 @@ void delays_init(){
 	for(int i =0; i < number_of_mics; i++){
 		float num_of_samples_to_delay = (freq * get_current_delay(i))/speed_of_sound;
 		float fractional = fmod(num_of_samples_to_delay,1);	
-		delays[i] = delay_init(num_of_samples_to_delay,fractional, feedback_volume, mix_volume,blend_parameter, i);
+		delay_init(num_of_samples_to_delay,fractional, i);
 	}
 }
 
@@ -99,7 +111,7 @@ void change_delay(){
 	for(int i = 0; i < number_of_mics; i++){
 		float num_of_samples_to_delay = (freq * get_current_delay(i))/speed_of_sound;
 		float fractional = fmod(num_of_samples_to_delay, 1);
-		delay_set_delay(delays[i], num_of_samples_to_delay, fractional);
+		delay_init(num_of_samples_to_delay, fractional, i);
 	}
 }
 
@@ -108,7 +120,6 @@ float locate(float * buffer1, float * buffer2, float * buffer3, int buf_size){
 	set_buffer(m2, buffer2);
 	set_buffer(m3, buffer3);
 	set_buffer_size(buf_size);
-	return find_source(m1,m2,m3);
 }
 
 void print_delay_info(){
@@ -130,7 +141,7 @@ void sin_test(){
 		int x = 0;
 		for(float i = 0; i*M_PI/180 < 4*M_PI; i = i + 4){
 			y[x] = sin(i*M_PI/180);
-			y_delayed[x] = delay_out(delays[g], y[x]);
+			y_delayed[x] = delay_out(g, y[x]);
 			x+=1;
 
 		}

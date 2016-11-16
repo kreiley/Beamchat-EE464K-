@@ -88,7 +88,6 @@ void Rx_thresholdCallbackfn(uint32_t status)
 	uint32_t u32Len, i;
 	uint32_t *pBuff;
 	uint16_t *pBuff16;
-
 	
 /*---------------------------------------*/		
 	if (DataReady) DPWM_OVF = TRUE;
@@ -255,9 +254,11 @@ int main (void)
 		{
 			//DPWM->FIFO = DataOut_sel;
 			/*Beamforming algorithm can be put here*/
-			
-			output = run(DataOut[0], DataOut[1], DataOut[2],DataOut[3], position);
-			position++;
+			float in1 = (float) DataOut[0];
+			float in2 = (float) DataOut[1];
+			float in3 = (float) DataOut[2];
+			float in4 = (float) DataOut[3];		
+			output = run(in1, in2, in3, in4);
 			DataReady = FALSE;
 		}
 	}

@@ -2,15 +2,9 @@
 #include <math.h>
 #include "delay.h"
 #include "delaytest.h"
+#include "FixedBeamformer.h"
 
 #define num_mics 8
-
-typedef struct mic_array{
-    	float x;
-	float y;
-	float current_delay;
-} mic_array;
-
 static mic_array mics[num_mics];
 
 void calculate_delay(float angle){

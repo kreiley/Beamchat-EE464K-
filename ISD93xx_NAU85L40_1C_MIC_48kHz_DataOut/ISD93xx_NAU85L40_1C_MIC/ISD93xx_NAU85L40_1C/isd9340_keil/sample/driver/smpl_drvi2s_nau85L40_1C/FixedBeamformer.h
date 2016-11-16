@@ -3,9 +3,9 @@
 #define __FIXEDBEAMFORMER_H__
 
 extern void mic_array_init();
-extern void calculate_delay(double angle);
-extern double get_current_delay(int mic_number);
-extern double get_x(int mic_number);
-extern double get_y(int mic_number);
+extern void calculate_delay(float angle);
+extern float get_current_delay(int mic_number);
+extern float get_x(int mic_number);
+extern float get_y(int mic_number);
 
 #endif

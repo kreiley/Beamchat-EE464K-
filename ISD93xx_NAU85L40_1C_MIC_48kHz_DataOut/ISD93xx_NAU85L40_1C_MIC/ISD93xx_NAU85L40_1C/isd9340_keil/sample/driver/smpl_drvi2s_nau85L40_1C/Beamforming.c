@@ -16,28 +16,15 @@
 #define buffer_size 100
 #define BUFFER_SIZE 64000
 
-double freq = 16000; //frequency of data input
-double speed_of_sound = 340.3; //speed of sound at sea level
-int filterLength = 11; //Numer of FIR filter taps for fractional delay(shouled be odd)
-double angle = 0;
-double volume = .75;
-bool turn_off = false;
-char mode = 'M';
-microphone * m1;
-microphone * m2;
-microphone * m3;
-
-void run(double * in);
-void delays_init();
-void localization_init();
-void change_delay();
-double locate(double * buffer1, double * buffer2, double * buffer3, int buf_size);
-void sin_test();
-void print_delay_info();
-double * wav_file_tests();
+void Beamforming_Initialization(void){}
+	float angle = 0;
+	mic_array_init();
+	delays_init();
+	localization_init();
+}
 
 
-int main(int argc, char* argv[]){
+int main1(int argc, char* argv[]){
 	if(argc == 2){angle = atof(argv[1]);}
 	if(argc == 3){angle = atof(argv[1]); volume = atof(argv[2]);}
 	if(argc == 4){angle = atof(argv[1]); volume = atof(argv[2]); mode = argv[3][0];}
@@ -64,37 +51,17 @@ int main(int argc, char* argv[]){
 	//run(in);
 }
 
-void run(double * in){
-	double sum = 0;
-	double output = 0;
-	int buf = 0;
-	double * buffer1 = malloc(sizeof(double *) * buffer_size);
-	double * buffer2 = malloc(sizeof(double *) * buffer_size);
-	double * buffer3 = malloc(sizeof(double *) * buffer_size);
-	while(!turn_off){
-		double sum;
-		sum = delay_out(delays[0], in[0]);	
-		sum+= delay_out(delays[1], in[1]);	
-		sum+= delay_out(delays[2], in[2]);	
-		sum+= delay_out(delays[3], in[3]);
-		sum+= delay_out(delays[4], in[4]);
-		sum+= delay_out(delays[5], in[5]);
-		sum+= delay_out(delays[6], in[6]);
-		sum+= delay_out(delays[7], in[7]);
-		output = sum/number_of_mics;
-		buf++;
-		buffer1[buf] = in[4];
-		buffer2[buf] = in[6];
-		buffer3[buf] = in[7];
-		if(buf == buffer_size){
-			angle = locate(buffer1, buffer2, buffer3, buffer_size);
-			change_delay();
-			buf = 0;
-		}
-	}
+uint32_t run(uint32_t * in0, uint32_t * in1, uint32_t * in2, uint32_t * in3, int32_t position){
+	uint32_t sum = 0;
+	uint32_t output = 0;
+	sum = delay_out(delays[0], in0[position]);	
+	sum+= delay_out(delays[1], in1[position]);	
+	sum+= delay_out(delays[2], in2[position]);	
+	sum+= delay_out(delays[3], in3[position]);
+	return sum/4;
 }
 /*
-double * wav_file_tests(){
+float * wav_file_tests(){
 	
 	FILE * outfile = fopen("output.wav", "wb");
 	int BUFSIZE = 512;
@@ -112,8 +79,8 @@ double * wav_file_tests(){
 void delays_init(){
 	calculate_delay(angle);
 	for(int i =0; i < number_of_mics; i++){
-		double num_of_samples_to_delay = (freq * get_current_delay(i))/speed_of_sound;
-		double fractional = fmod(num_of_samples_to_delay,1);	
+		float num_of_samples_to_delay = (freq * get_current_delay(i))/speed_of_sound;
+		float fractional = fmod(num_of_samples_to_delay,1);	
 		delays[i] = delay_init(num_of_samples_to_delay,fractional, feedback_volume, mix_volume,blend_parameter, i);
 	}
 }
@@ -130,13 +97,13 @@ void localization_init(){
 void change_delay(){
 	calculate_delay(angle);
 	for(int i = 0; i < number_of_mics; i++){
-		double num_of_samples_to_delay = (freq * get_current_delay(i))/speed_of_sound;
-		double fractional = fmod(num_of_samples_to_delay, 1);
+		float num_of_samples_to_delay = (freq * get_current_delay(i))/speed_of_sound;
+		float fractional = fmod(num_of_samples_to_delay, 1);
 		delay_set_delay(delays[i], num_of_samples_to_delay, fractional);
 	}
 }
 
-double locate(double * buffer1, double * buffer2, double * buffer3, int buf_size){
+float locate(float * buffer1, float * buffer2, float * buffer3, int buf_size){
 	set_buffer(m1, buffer1);
 	set_buffer(m2, buffer2);
 	set_buffer(m3, buffer3);
@@ -146,8 +113,8 @@ double locate(double * buffer1, double * buffer2, double * buffer3, int buf_size
 
 void print_delay_info(){
 	for(int i =0; i<number_of_mics; i++){
-		double time_of_delay = get_current_delay(i)/speed_of_sound;
-		double num_of_samples_to_delay = (freq * get_current_delay(i))/speed_of_sound;
+		float time_of_delay = get_current_delay(i)/speed_of_sound;
+		float num_of_samples_to_delay = (freq * get_current_delay(i))/speed_of_sound;
 		printf("\n\nMicrophone %d:\n",i);
 		printf("Distance of mic in meters from furthest mic from Audio Source:%f\n",get_current_delay(i));
 		printf("Time of delay in seconds: %f\n", time_of_delay);
@@ -156,12 +123,12 @@ void print_delay_info(){
 }
 
 void sin_test(){
-	double * y_mic[number_of_mics];
-	double * y = malloc(8*180*sizeof(double));
+	float * y_mic[number_of_mics];
+	float * y = malloc(8*180*sizeof(float));
 	for (int g = 0; g < number_of_mics; g++){
-		double *y_delayed = malloc(8*180*sizeof(double));
+		float *y_delayed = malloc(8*180*sizeof(float));
 		int x = 0;
-		for(double i = 0; i*M_PI/180 < 4*M_PI; i = i + 4){
+		for(float i = 0; i*M_PI/180 < 4*M_PI; i = i + 4){
 			y[x] = sin(i*M_PI/180);
 			y_delayed[x] = delay_out(delays[g], y[x]);
 			x+=1;

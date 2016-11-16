@@ -7,11 +7,11 @@
 #define BUFFER_SIZE 64000
 #define ORDER 3
 
-delay * delay_init(double num_samples_to_delay, double fractional_delay, double fb_v, double dtm_v, double delay_blend_param, int mic) {
+delay * delay_init(float num_samples_to_delay, float fractional_delay, float fb_v, float dtm_v, float delay_blend_param, int mic) {
 	delay *d = malloc (sizeof(delay));
 	if(d == NULL){return NULL;}
 	else{
-		d->buffer = malloc(sizeof (double) * BUFFER_SIZE);
+		d->buffer = malloc(sizeof (float) * BUFFER_SIZE);
 		if(d->buffer == NULL){return NULL;}
 		else{
 			for(int i = 0; i < BUFFER_SIZE ; i++){
@@ -28,7 +28,7 @@ delay * delay_init(double num_samples_to_delay, double fractional_delay, double 
 	return d;
 }
 
-void delay_set_delay(delay *d, double num_samples_to_delay, double fractional_delay){
+void delay_set_delay(delay *d, float num_samples_to_delay, float fractional_delay){
 	if(fractional_delay > 0.5){
 		num_samples_to_delay +=1;
 		fractional_delay-=1;
@@ -49,11 +49,11 @@ void delay_set_delay(delay *d, double num_samples_to_delay, double fractional_de
 	d->fractional_delay = fractional_delay;
 }
 
-void delay_set_feedback_volume(delay *d,double fb_v){
+void delay_set_feedback_volume(delay *d,float fb_v){
 	d->feedback_volume = fb_v;
 }
 
-void delay_set_delay_tap_mix_volume(delay *d,double dtm_v){
+void delay_set_delay_tap_mix_volume(delay *d,float dtm_v){
 	d->delay_tap_mix_volume = dtm_v;
 }
 
@@ -61,7 +61,7 @@ void delay_set_mic(delay *d,int mic){
 	d->mic = mic;	
 }
 
-void delay_set_blend_param(delay *d, double delay_blend_param){
+void delay_set_blend_param(delay *d, float delay_blend_param){
 	d->delay_blend_param = delay_blend_param;
 }
 
@@ -72,9 +72,9 @@ void delete_delay(delay *d){
 	}
 }
 
-double delay_out(delay *d, double in) {
-	double out;
-	double x;
+float delay_out(delay *d, float in) {
+	float out;
+	float x;
 
 	*d->write_pointer = in;
 		

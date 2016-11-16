@@ -11,6 +11,7 @@
 #include "DrvI2C.h"
 #include "DrvDPWM.h"
 #include "DrvPDMA.h"
+#include "Beamforming.h"
 /*---------------------------------------------------------------------------------------------------------*/
 /* Macro, type and constant definitions                                                                    */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -246,13 +247,17 @@ int main (void)
 
 	// Enable I2S Rx function to receive data
 	DrvI2S_EnableRx(TRUE);
-	
+	Beamforming_Initialization();
+	uint32_t position = 0;
 	while(1)
 	{
 		if (DataReady)
 		{
 			//DPWM->FIFO = DataOut_sel;
 			/*Beamforming algorithm can be put here*/
+			
+			output = run(DataOut[0], DataOut[1], DataOut[2],DataOut[3], position);
+			position++;
 			DataReady = FALSE;
 		}
 	}

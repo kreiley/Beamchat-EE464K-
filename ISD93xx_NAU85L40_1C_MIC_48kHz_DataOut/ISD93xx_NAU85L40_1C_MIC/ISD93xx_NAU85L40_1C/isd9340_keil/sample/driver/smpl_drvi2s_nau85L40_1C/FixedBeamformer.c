@@ -85,7 +85,7 @@ void calculate_delay(float angle){
 
 void mic_array_init(){
 	printf("\n Microphone Positions:\n");
-	for(int i = 4; i < num_mics; i++){
+/*	for(int i = 4; i < num_mics; i++){
 		float theta = i * M_PI/4;
 		float a =.01;
 		float b =.7;
@@ -95,6 +95,25 @@ void mic_array_init(){
 	}
 	//mics[num_mics-1].x = 0.489641;
 	//mics[num_mics-1].y = 0.08055;
+*/
+	mics[0].x =  0.013092;
+	mics[1].x =  0.007873;
+	mics[2].x = -0.025130;
+	mics[3].x = -0.094278;
+	mics[4].x = -0.112293;
+	mics[5].x = -0.062427;
+	mics[6].x =  0.184213;
+	mics[7].x =  0.274856;
+
+	mics[0].y =  0.007152;
+	mics[1].y =  0.026832;
+	mics[2].y =  0.046000;
+	mics[3].y =  0.027662;
+	mics[4].y = -0.061346;
+	mics[5].y = -0.212765;
+	mics[6].y = -0.337199;
+	mics[7].y =  0.057511;
+
 	printf("\nx =\n");
 	for(int i = 0; i < num_mics; i++){printf("%f\n",mics[i].x);}
 	printf("\ny =\n");

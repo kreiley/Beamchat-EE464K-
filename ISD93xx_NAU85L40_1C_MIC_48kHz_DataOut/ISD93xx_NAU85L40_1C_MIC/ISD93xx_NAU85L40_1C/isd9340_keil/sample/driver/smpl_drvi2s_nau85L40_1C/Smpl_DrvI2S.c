@@ -35,7 +35,6 @@ static BOOL DPWM_OVF = FALSE;
 
 
 
-
 void  NAU85L40_EnterADCandDACMode(uint8_t deviceID);
 /*---------------------------------------------------------------------------------------------------------*/
 /* Macro, type and constant definitions                                                                    */
@@ -247,7 +246,6 @@ int main (void)
 	// Enable I2S Rx function to receive data
 	DrvI2S_EnableRx(TRUE);
 	Beamforming_Initialization();
-	uint32_t position = 0;
 	while(1)
 	{
 		if (DataReady)
@@ -258,7 +256,8 @@ int main (void)
 			float in2 = (float) DataOut[1];
 			float in3 = (float) DataOut[2];
 			float in4 = (float) DataOut[3];		
-			output = run(in1, in2, in3, in4);
+			DPWM->FIFO = run(in1, in2, in3, in4);
+			
 			DataReady = FALSE;
 		}
 	}

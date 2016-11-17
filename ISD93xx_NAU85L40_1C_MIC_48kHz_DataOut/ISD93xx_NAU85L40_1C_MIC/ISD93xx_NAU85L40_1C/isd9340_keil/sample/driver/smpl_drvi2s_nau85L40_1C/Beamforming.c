@@ -63,7 +63,7 @@ int main(int argc, char* argv[]){
 	//run(in);
 }
 
-uint32_t run(float in0, float in1, float in2, float in3){
+uint16_t run(float in0, float in1, float in2, float in3){
 	float output = 0;
 	float sum;
 	sum = delay_out(0, in0);	

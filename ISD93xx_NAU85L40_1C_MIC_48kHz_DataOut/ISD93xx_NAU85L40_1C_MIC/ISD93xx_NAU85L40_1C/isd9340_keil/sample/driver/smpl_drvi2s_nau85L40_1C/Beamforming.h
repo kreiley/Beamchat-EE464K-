@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "localization.h"
 extern void Beamforming_Initialization(void);
-extern uint32_t run(float in0, float in1, float in2, float in3);
+extern uint16_t run(float in0, float in1, float in2, float in3);
 void delays_init();
 void localization_init();
 void change_delay();

@@ -41,7 +41,7 @@ float find_source(microphone * m1, microphone * m2, microphone * m3){
 	int num_samples1 = -1;
 	int num_samples2 = -1;
 	for(int i = 0; i < buffer_size; i++){
-		printf("m1 = %f  m2 =%f  m3 =%f\n", m1->buffer[i], m2->buffer[i], m3->buffer[i]);
+// 		printf("m1 = %f  m2 =%f  m3 =%f\n", m1->buffer[i], m2->buffer[i], m3->buffer[i]);
 		if(!done1 && m1->buffer[i] >= threshold){
 			done1 = true;
 			if(!first){first = 1;}
@@ -65,19 +65,19 @@ float find_source(microphone * m1, microphone * m2, microphone * m3){
 		if(first > 0 && second == 0){
 			num_samples1++;
 			num_samples2++;
-			printf("num_samples1 = %d, num_samples2 = %d\n", num_samples1, num_samples2);
+//			printf("num_samples1 = %d, num_samples2 = %d\n", num_samples1, num_samples2);
 		}
 		if(second > 0 && third == 0){
 			if(num_samples1 < 0){num_samples1 = 0;}
 			num_samples2++;
-			printf("num_samples2 = %d\n",num_samples2);
+//			printf("num_samples2 = %d\n",num_samples2);
 		}
 		if(third > 0){
-			printf("\nfirst = %d, second = %d, third = %d\n", first, second, third);
+//			printf("\nfirst = %d, second = %d, third = %d\n", first, second, third);
 			break;
 		}
 	}
-	printf("m1 x = %f y = %f, m2 x = %f y = %f, m3 x = %f y = %f\n",m1->x,m1->y,m2->x,m2->y,m3->x,m3->y);
+//	printf("m1 x = %f y = %f, m2 x = %f y = %f, m3 x = %f y = %f\n",m1->x,m1->y,m2->x,m2->y,m3->x,m3->y);
 	if(num_samples1 < 0){return -1;}
 	float delay = (speed_of_sound * num_samples1)/freq;
 	if     (first == 1 && second == 2){return calc_left (delay, distance12, angle12);}

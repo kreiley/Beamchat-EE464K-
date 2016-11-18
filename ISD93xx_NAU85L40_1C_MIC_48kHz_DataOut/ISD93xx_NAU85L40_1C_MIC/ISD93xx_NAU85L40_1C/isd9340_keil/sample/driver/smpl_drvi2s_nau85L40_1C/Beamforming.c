@@ -26,7 +26,7 @@ char mode = 'M';
 microphone * m1;
 microphone * m2;
 microphone * m3;
-
+float angles[360] = {0};
 
 void Beamforming_Initialization(void){
 	angle = 0;
@@ -59,6 +59,7 @@ int main(int argc, char* argv[]){
 	print_delay_info();
 	localization_init();
 	sin_test();
+	localization_test();
 	/*wav_file_tests();*/
 	//run(in);
 }
@@ -120,6 +121,7 @@ float locate(float * buffer1, float * buffer2, float * buffer3, int buf_size){
 	set_buffer(m2, buffer2);
 	set_buffer(m3, buffer3);
 	set_buffer_size(buf_size);
+	return find_source(m1,m2,m3);
 }
 
 void print_delay_info(){
@@ -148,7 +150,8 @@ void sin_test(){
 		y_mic[g] = y_delayed;
 
 	}
-	printf("\n\n:::::::ANGLE = %f::::::::::\n\n", locate(y_mic[4], y_mic[6], y_mic[7],buffer_size));
+	angles[(int) angle] = locate(y_mic[4],y_mic[6], y_mic[7],buffer_size);
+	/*
 	printf("\n---------INPUT-------\n\n");
 	for(int i = 0; i < 180; i++){
 		printf("%f\n",y[i]);
@@ -158,5 +161,18 @@ void sin_test(){
 		for(int i = 0; i < 180; i++){
 			printf("%f\n",y_mic[mic][i]);
 		}
+	}
+	*/
+}
+
+void localization_test(){
+	for (int i = 0; i < 360; i++){
+		angle = i;
+		change_delay();
+		sin_test();
+	}
+	printf("\n------------ANGLE RESOLUTIONS------\n");
+	for (int i = 0; i < 360; i++){
+		printf("%f\n",angles[i]);	
 	}
 }

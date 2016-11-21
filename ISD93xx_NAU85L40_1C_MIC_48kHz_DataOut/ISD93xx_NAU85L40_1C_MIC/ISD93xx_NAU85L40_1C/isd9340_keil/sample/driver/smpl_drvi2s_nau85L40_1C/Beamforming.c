@@ -15,7 +15,6 @@
 #define buffer_size 100
 #define BUFFER_SIZE 64000
 
-delay * delays[8];
 float freq = 16000; //frequency of data input
 float speed_of_sound = 340.3; //speed of sound at sea level
 int filterLength = 11; //Numer of FIR filter taps for fractional delay(shouled be odd)
@@ -23,13 +22,13 @@ float angle = 0;
 float volume = .75;
 bool turn_off = false;
 char mode = 'M';
-microphone * m1;
-microphone * m2;
-microphone * m3;
 float angles[360] = {0};
+
+
 
 void Beamforming_Initialization(void){
 	angle = 0;
+	location_buffer = 0;
 	mic_array_init();
 	delays_init();
 	localization_init();
@@ -56,10 +55,12 @@ int main(int argc, char* argv[]){
 */
 	mic_array_init();
 	delays_init();
+/*
 	print_delay_info();
+*/
 	localization_init();
-	sin_test();
-	localization_test();
+	//sin_test();
+	//localization_test();
 	/*wav_file_tests();*/
 	//run(in);
 }
@@ -71,6 +72,27 @@ uint16_t run(float in0, float in1, float in2, float in3){
 	sum+= delay_out(1, in1);	
 	sum+= delay_out(2, in2);	
 	sum+= delay_out(3, in3);
+	return sum/4;
+}
+
+uint16_t run_and_locate(float in0, float in1, float in2, float in3){
+	float output = 0;
+	float sum;
+	sum = delay_out(4, in0);
+	add_to_buffer(0, in0, location_buffer);
+	sum+= delay_out(5, in1);
+	sum+= delay_out(6, in2);
+	add_to_buffer(1, in2, location_buffer);
+	sum+= delay_out(7, in3);
+	add_to_buffer(2, in3, location_buffer);
+	if(location_buffer == buffer_size -1){
+		float x = locate(buffer_size);
+		if(x != -1){angle = x;change_delay();}
+		location_buffer = 0;
+	}
+	else{
+		location_buffer++;
+	}
 	return sum/4;
 }
 /*
@@ -99,10 +121,10 @@ void delays_init(){
 }
 
 void localization_init(){
-	m1 = build_mic(get_x(4), get_y(4));
-	m2 = build_mic(get_x(6), get_y(6));
-	m3 = build_mic(get_x(7), get_y(7));
-	init_triangle(m1,m2,m3);
+	build_mic(get_x(4), get_y(4), 0);
+	build_mic(get_x(6), get_y(6), 1);
+	build_mic(get_x(7), get_y(7), 2);
+	init_triangle(0 ,1, 2);
 	set_buffer_size(buffer_size);
 
 }
@@ -116,14 +138,11 @@ void change_delay(){
 	}
 }
 
-float locate(float * buffer1, float * buffer2, float * buffer3, int buf_size){
-	set_buffer(m1, buffer1);
-	set_buffer(m2, buffer2);
-	set_buffer(m3, buffer3);
+float locate(int buf_size){
 	set_buffer_size(buf_size);
-	return find_source(m1,m2,m3);
+	return find_source();
 }
-
+/*
 void print_delay_info(){
 	for(int i =0; i<number_of_mics; i++){
 		float time_of_delay = get_current_delay(i)/speed_of_sound;
@@ -134,7 +153,8 @@ void print_delay_info(){
 		printf("Number of Samples to delay: %f \n\n",num_of_samples_to_delay);
 	}
 }
-
+*/
+/*
 void sin_test(){
 	float * y_mic[number_of_mics];
 	float * y = malloc(8*180*sizeof(float));
@@ -151,7 +171,7 @@ void sin_test(){
 
 	}
 	angles[(int) angle] = locate(y_mic[4],y_mic[6], y_mic[7],buffer_size);
-	/*
+	
 	printf("\n---------INPUT-------\n\n");
 	for(int i = 0; i < 180; i++){
 		printf("%f\n",y[i]);
@@ -162,7 +182,7 @@ void sin_test(){
 			printf("%f\n",y_mic[mic][i]);
 		}
 	}
-	*/
+	
 }
 
 void localization_test(){
@@ -176,3 +196,4 @@ void localization_test(){
 		printf("%f\n",angles[i]);	
 	}
 }
+*/

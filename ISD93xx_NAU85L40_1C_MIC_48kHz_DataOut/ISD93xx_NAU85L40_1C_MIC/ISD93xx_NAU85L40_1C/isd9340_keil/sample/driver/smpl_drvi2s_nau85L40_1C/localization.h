@@ -5,17 +5,17 @@
 typedef struct microphone {
 	float x;
 	float y;
-	float * buffer;
+	float buffer[100];
 } microphone;
 
-extern microphone * build_mic(float x, float y);
-extern float find_source(microphone * m1, microphone * m2, microphone * m3);
+extern void build_mic(float x, float y,int mic);
+extern float find_source();
 extern void set_buffer_size(int bf_size);
-float distance_calc(microphone * m1, microphone * m2);
-float degree_calc(microphone * m1, microphone * m2);
-extern void init_triangle(microphone * m1, microphone * m2, microphone * m3); 
-extern void set_buffer(microphone * m1, float * buffer);
-void find_mic_3(microphone * m1, microphone * m2);
+float distance_calc(int m1, int m2);
+float degree_calc(int m1, int m2);
+extern void init_triangle(int m1, int m2, int m3); 
+extern void add_to_buffer(int m1, float add, int placement);
+void find_mic_3(int m1, int m2);
 float calc_right(float delay, float distance, float angle);
 float calc_left(float delay, float distance, float angle);
 float to_degrees(float angle);

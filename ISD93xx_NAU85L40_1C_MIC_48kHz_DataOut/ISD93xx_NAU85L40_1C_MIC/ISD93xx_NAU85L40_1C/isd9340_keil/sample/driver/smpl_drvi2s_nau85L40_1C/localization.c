@@ -9,7 +9,7 @@
 #define freq 16000
 
 /*must be equalateral triangle microphone array because its easier*/
-
+microphone microphones[3] = {0};
 int buffer_size = 0;
 float distance12 = 0;
 float distance13 = 0;
@@ -21,17 +21,15 @@ float angle23 = 0;
 float angle31 = 0;
 float angle32 = 0;
 
-microphone * build_mic(float x, float y){
-	microphone * mic = malloc(sizeof(microphone));
-	mic->x = x;
-	mic->y = y;
-	mic->buffer = NULL;
-	return mic;
+void build_mic(float x, float y,int mic){
+	microphones[mic].x = x;
+	microphones[mic].y = y;
+	microphones[mic].buffer;
 }
 
 /*tan((speed of sound * number of samples / freq)/ distance) = angle */ 
 
-float find_source(microphone * m1, microphone * m2, microphone * m3){
+float find_source(){
 	bool done1  = false;
 	bool done2  = false;
 	bool done3  = false;
@@ -42,20 +40,20 @@ float find_source(microphone * m1, microphone * m2, microphone * m3){
 	int num_samples2 = -1;
 	for(int i = 0; i < buffer_size; i++){
 // 		printf("m1 = %f  m2 =%f  m3 =%f\n", m1->buffer[i], m2->buffer[i], m3->buffer[i]);
-		if(!done1 && m1->buffer[i] >= threshold){
+		if(!done1 && microphones[0].buffer[i] >= threshold){
 			done1 = true;
 			if(!first){first = 1;}
 			else if(!second){second = 1;}
 			else {third = 1;}
 		}
-		if(!done2 && m2->buffer[i] >= threshold){
+		if(!done2 && microphones[1].buffer[i] >= threshold){
 			done2 = true;
 			if(!first){first = 2;}
 			else if(!second){second = 2;}
 			else {third = 2;}
 		
 		}
-		if(!done3 && m3->buffer[i] >= threshold){
+		if(!done3 && microphones[2].buffer[i] >= threshold){
 			done3 = true;
 			if(!first){first = 3;}
 			else if(!second){second = 3;}
@@ -111,26 +109,26 @@ void set_buffer_size(int bf_size){
 	buffer_size = bf_size;
 }
 
-void set_buffer(microphone * m1, float * buffer){
-	m1->buffer = buffer;	
+void add_to_buffer(int mic, float add, int placement){
+	microphones[mic].buffer[placement] = add;	
 }
 
-float distance_calc(microphone * m1, microphone * m2){
+float distance_calc(int m1, int m2){
 	float a, b;
-	a = m1->x - m2->x;
-	b = m1->y - m2->y;	
+	a = microphones[m1].x - microphones[m2].x;
+	b = microphones[m1].y - microphones[m2].y;	
 	return sqrt(a*a + b*b);
 }
 
-float degree_calc(microphone * m1, microphone *m2){
+float degree_calc(int m1, int m2){
 	float x , y;
-	x = m2->x - m1->x;
-	y = m2->y - m1->y;
+	x = microphones[m2].x - microphones[m1].x;
+	y = microphones[m2].y - microphones[m1].y;
 	if(x == 0 && y == 0){printf("error");return -7;}
 	return atan2(y,x);
 }
 
-void init_triangle(microphone * m1, microphone * m2, microphone * m3){
+void init_triangle(int  m1, int m2, int m3){
 	angle12 = degree_calc(m1, m2);
 	angle13 = degree_calc(m1, m3);
 	angle21 = degree_calc(m2, m1);
@@ -143,13 +141,13 @@ void init_triangle(microphone * m1, microphone * m2, microphone * m3){
 	find_mic_3(m1,m2);
 }
 
-void find_mic_3(microphone * m1, microphone * m2){
+void find_mic_3(int m1, int m2){
 	float angle1 = degree_calc(m1,m2) + 1.0472;
 	float angle2 = degree_calc(m2,m1) - 1.0472;
-	float b1 = m1->y - tan(angle1) * m1->x;
-	float b2 = m2->y - tan(angle2) * m2->x;
-	printf("angle1 = %f, angle2 = %f, b1 = %f, b2 = %f \n", angle1, angle2,b1,b2);
+	float b1 = microphones[m1].y - tan(angle1) * microphones[m1].x;
+	float b2 = microphones[m2].y - tan(angle2) * microphones[m2].x;
+	//printf("angle1 = %f, angle2 = %f, b1 = %f, b2 = %f \n", angle1, angle2,b1,b2);
 	float x = (b2 - b1)/(tan(angle1) - tan(angle2));
 	float y = (tan(angle1))*x + b1;
-	printf("x = %f, y = %f", x, y);
+	//printf("x = %f, y = %f", x, y);
 }

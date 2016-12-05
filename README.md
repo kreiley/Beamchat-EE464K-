@@ -1,2 +1,2 @@
-# NAU85L40_DataOut
-C driver for I2S interfacing between Nuvoton NAU85L40 EVB and the Nu-Tiny-Link
+# Beamchat
+Our project, sponsored by Nuvoton, was to create an audio conferencing system capable of focusing on capturing sound from a single speaker and removing all other surrounding noise since normally only one person is speaking at any given time in an audio conference setting. We were tasked with using NAU85L40 ADC evaluation boards in the final product, and to use beamforming algorithms for speaker location detection. We were given a budget of $1000 for purchasing all of our parts and the semester to complete a prototype of our design. 
